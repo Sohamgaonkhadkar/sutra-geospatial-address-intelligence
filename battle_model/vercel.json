@@ -2,23 +2,23 @@
     "rewrites":  [
                      {
                          "source":  "/health",
-                         "destination":  "https://sutra-backend.onrender.com/health"
+                         "destination":  "https://sutra-geospatial-address-intelligence.onrender.com/health"
                      },
                      {
                          "source":  "/v1/:path*",
-                         "destination":  "https://sutra-backend.onrender.com/v1/:path*"
+                         "destination":  "https://sutra-geospatial-address-intelligence.onrender.com/v1/:path*"
                      },
                      {
                          "source":  "/resolve",
-                         "destination":  "https://sutra-backend.onrender.com/resolve"
+                         "destination":  "https://sutra-geospatial-address-intelligence.onrender.com/resolve"
                      },
                      {
                          "source":  "/places",
-                         "destination":  "https://sutra-backend.onrender.com/places"
+                         "destination":  "https://sutra-geospatial-address-intelligence.onrender.com/places"
                      },
                      {
                          "source":  "/tasks",
-                         "destination":  "https://sutra-backend.onrender.com/tasks"
+                         "destination":  "https://sutra-geospatial-address-intelligence.onrender.com/tasks"
                      }
                  ],
     "outputDirectory":  "site"
