@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/health", "destination": "https://sutra-backend.onrender.com/health" },
+    { "source": "/v1/:path*", "destination": "https://sutra-backend.onrender.com/v1/:path*" },
+    { "source": "/resolve", "destination": "https://sutra-backend.onrender.com/resolve" },
+    { "source": "/places", "destination": "https://sutra-backend.onrender.com/places" },
+    { "source": "/tasks", "destination": "https://sutra-backend.onrender.com/tasks" }
+  ]
+}

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: sutra-backend
+    env: python
+    buildCommand: ""
+    startCommand: python3 tools/serve_runtime.py --port $PORT --host 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
