@@ -6,6 +6,3 @@ venv/
 __pycache__/
 *.pyc
 .env
-data/derived/*
-!data/derived/runtime/
-!data/derived/runtime_indexes/
