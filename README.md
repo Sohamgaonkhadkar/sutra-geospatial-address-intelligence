@@ -1,6 +1,6 @@
 # SUTRA — Address Geocoder That Learns from Field Visits
 
-SUTRA (**Semantic Utility for Traceable Resolution of Addresses**) treats address geocoding as an evidence-driven decision problem rather than a one-shot coordinate prediction. It resolves written addresses using a restricted official candidate family, returns a coordinate accompanied by spatial granularity and calibrated uncertainty, and utilizes trusted field evidence to continuously correct place beliefs over time.
+SUTRA (**Semantic Utility for Traceable Resolution of Addresses**) treats address geocoding as an evidence-driven decision problem rather than a one-shot coordinate prediction. It resolves written addresses using a restricted official candidate family, returns a coordinate accompanied by spatial granularity and provenance-informed uncertainty, and utilizes trusted field evidence to continuously correct place beliefs over time.
 
 👉 **[Open the SUTRA Web Application](https://sutra-geospatial-address-intelligence.vercel.app/)**
 
@@ -48,8 +48,8 @@ SUTRA abandons black-box geographic predictions. The resolution path follows:
 2. **Normalization and Parsing:** Typing specific elements (house no, locality).
 3. **Entity Resolution:** Aligning tokens against official town and locality gazetteers.
 4. **Candidate Generation:** Fetching restricted, official-only candidates (frozen vendor baselines, local boundaries, verified memory).
-5. **Candidate Ranking:** A small learning-to-rank algorithm scores candidates based on text features, hierarchy, and spatial safety.
-6. **Belief Fusion and Uncertainty:** Combining score and historical place memory, then wrapping it in a calibrated tier/radius.
+5. **Candidate Ranking:** A deterministic RULE-based ranker scores candidates based on spatial safety, evidence thresholds, and text hierarchy. (Learned challengers like LambdaMART were evaluated but failed to clear the offline promotion gate).
+6. **Belief Fusion and Uncertainty:** Combining score and historical place memory, then wrapping it in uncertainty tiers and radii informed by candidate provenance and available field evidence.
 7. **Actionable Outcomes:** Deciding whether to `SERVE` (safe), `VERIFY_FIRST` (uncertain), or `REFUSE` (unsafe/no candidate).
 
 **When Field Visits Occur:**
@@ -132,9 +132,9 @@ SUTRA relies exclusively on **Official PS3 Data** (`data/official_ps3/`).
    *Evidence:* The vendor baseline has a median error of 376.4 m. Furthermore, failed agent check-ins ("not traceable") have a dwell time of 1.3 minutes but are located a median 1,603 m away from surveyed truth.
    *Consequence:* Relying blindly on vendor points without uncertainty radii leads to catastrophic failure.
 
-2. **Retrieval-v2 and Candidate Generation vs Ranking:** 
-   *Finding:* Improving the candidate pool does not automatically mean the ranker will select the right one.
-   *Evidence:* The `retrieval-v2` update improved the candidate oracle ceiling from 88.01% to 91.44% (within 500 m) and reduced the oracle median error from 214.1 m to 196.1 m. However, the top-1 ranked answer remained virtually unchanged (83.9%). 
+2. **Locality-Matching Defect, Candidate Generation vs Ranking:** 
+   *Finding:* Previous locality matching allowed shared tokens to accept stale pincodes, assigning the wrong locality in 118 of 292 pool rows. Improving the candidate pool does not automatically mean the ranker will select the right one.
+   *Evidence:* Evaluated on the 292-row pool, the `retrieval-v2` update improved the candidate oracle ceiling from 88.01% to 91.44% (within 500 m) and reduced the oracle median error from 214.1 m to 196.1 m. However, the top-1 product ranking remained virtually unchanged (83.9%). 
    *Consequence:* Candidate generation and ranking are separate, orthogonal problems.
 
 3. **Account Identity vs Physical-Place Identity & Co-location:** 
@@ -147,10 +147,10 @@ SUTRA relies exclusively on **Official PS3 Data** (`data/official_ps3/`).
    *Evidence:* Materializing a memory candidate from a mere vendor pin dropped temporal accuracy (< 100 m) from 0.8903 down to 0.6498. 
    *Consequence:* The final evidence-backed memory policy (P1b) strictly withholds pin-derived answers, safely narrowing the S-EVAL warm lane to 31 verified field-evidence cases rather than incorrectly emitting 45.
 
-5. **GPS Quality & Repeated-Visit Estimation:** 
-   *Finding:* Valid repeated visits correlate strongly. 
-   *Evidence:* Repeat visits agree spatially (77.7 m for same-agent, 75.8 m for different-agent). 
-   *Consequence:* SUTRA confidently promotes coordinates backed by independent confirmations.
+5. **GPS Trace Estimation vs Single Check-in:** 
+   *Finding:* A visit's GPS track is a far better location estimator than its single check-in sample. 
+   *Evidence:* Evaluated non-circularly on a temporal proxy population, aggregating the final three GPS trace fixes instead of a single check-in improved < 100 m accuracy from 0.7296 to 0.8240, reducing median error from 54.9 m to 22.7 m. 
+   *Consequence:* This became the production coordinate policy, demonstrating that GPS trace extraction is vital for coordinate estimation, distinct from cold-start address resolution accuracy.
 
 6. **Landmark Limitations and Negative Findings:** 
    *Finding:* Broadening candidate arms via generic landmarks creates excessive noise. 
@@ -240,7 +240,7 @@ npm run dev
 ```
 
 ## Q. Reproducibility and Tests
-All configurations and architectural contracts are mechanically verified by a suite of invariant checks.
+All configurations and architectural contracts can be mechanically verified by a suite of invariant checks. (Note: `check_workspace.py` requires UTF-8 encoding configuration to read audit logs natively on Windows).
 ```bash
 # Run full suite (manifest validation -> data cleaning -> invariant checks)
 bash tools/reproduce.sh
@@ -252,5 +252,5 @@ python3 tools/check_workspace.py
 
 ## R. Roadmap and Status
 - **Implemented & Tested:** Base Candidate Generation, Ranker Rules, Memory Integrity, Backend APIs, React Frontend, Offline Leakage evaluations.
-- **Offline Experiment / Analyzed:** LambdaMART challenger, Continuous Online Slow Loop retraining.
+- **Offline Experiment / Analyzed:** LambdaMART challenger, Continuous Offline Slow Loop retraining.
 - **Not Implemented:** Advanced LLM parsers, RL visit allocations, External Map Matching (prohibited by data governance).
