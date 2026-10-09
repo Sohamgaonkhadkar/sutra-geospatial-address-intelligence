@@ -84,6 +84,21 @@ The same engine drives a six-screen operator workbench (Overview, Resolver, Plac
 - Zero outbound socket attempts on every run; dataset hash-verified byte-identical.
 - As-of discipline everywhere (`observed_at < as_of`); belief recomputable at any instant; sealed S-EVAL read counter disclosed (including reads that went wrong during tooling — no parameter ever changed in response to a S-EVAL number).
 
+## 8. The two diagrams — workflow & architecture (your slide visuals)
+
+Two original vector diagrams live in the project (editable SVG + crisp 2200-px PNG, same warm identity as the report):
+
+- **Workflow** — `report_source/figures/diagram_workflow.svg` / `.png` — "the life of one address": production request path across the top, three typed outcomes in the middle, field-evidence loop along the bottom, one plum feedback arrow closing the cycle.
+  Raw: https://raw.githubusercontent.com/Sohamgaonkhadkar/sutra-geospatial-address-intelligence/arena/246f1c7f-sutra-geospatial-address-intel/report_source/figures/diagram_workflow.png
+- **Architecture** — `report_source/figures/diagram_architecture.svg` / `.png` — the four-lane system schematic: production path, field-evidence path, offline-evaluation-only lane, persistence.
+  Raw: https://raw.githubusercontent.com/Sohamgaonkhadkar/sutra-geospatial-address-intelligence/arena/246f1c7f-sutra-geospatial-address-intel/report_source/figures/diagram_architecture.png
+
+**How to talk through the workflow diagram (~60 seconds).** Trace left-to-right on the orange lane: "a raw address and its *purpose* enter; normalisation is deterministic; entity resolution fixes town/locality; candidate generation pulls five official arms plus eligible evidence arms; the RULE ranker is frozen and reason-coded; gate v2 emits one of three typed answers." Then the middle band: "SERVE ships a coordinate with a published radius and its evidence count; VERIFY FIRST ships a coordinate the courier must confirm; REFUSE ships *no coordinate at all* — escalation instead." Then the green loop: "every served decision eventually meets the field; the visit becomes evidence — tail-3 position at 7.6 m median, integrity-weighted, bounded belief update, sealed into place memory." Close on the plum arrow: "memory re-enters *candidate generation*, never the coordinate — and a failed visit moves the attempt count and the uncertainty, never the centre. That one arrow is the whole thesis: resolve → verify → learn → resolve better."
+
+**How to talk through the architecture diagram (~60 seconds).** Point at the lane borders first, not the boxes: "orange is production, green is evidence, plum is memory, slate is offline-only — and the slate lane has *no arrow into* anything above persistence; that separation is enforced by imports and tests, not by prose." Then one line per lane: production is the same six stages as the workflow slide with the decision ticket beside the gate; evidence is append-only, idempotent, as-of (negatives demote/widen/task but never move a coordinate; 278 open verify cases); offline is where LOGISTIC / LAMBDAMART / PAIRWISE were fit in memory on frozen data and the promotion gate said *no*, so RULE stays in production; persistence is the SQLite store (5,578 observations, 2,757 belief versions), runtime indexes and `contains_truth: false` offline packs.
+
+**Placement in the deck:** workflow diagram = the visual for slide 3→4 (put it up while you tell the one-address story); architecture diagram = slide 4's system view. If you have room for only one, choose the workflow — it carries the thesis; the architecture carries the governance.
+
 ---
 
 # PART II — WHAT TO PRESENT (suggested 14-slide deck, ~10–12 min)
@@ -92,9 +107,9 @@ The same engine drives a six-screen operator workbench (Overview, Resolver, Plac
 
 **Slide 2 — The data reality (the villain).** Three numbers with one chart: vendor median 376.4 m vs surveyed truth; 25.1% of visits fail after 1.28 min; failed visits cluster 194.7 m from *our own pin*. Punchline: "The coordinate without provenance, granularity and uncertainty is operationally unsafe."
 
-**Slide 3 — Reframing the task.** Four operator questions: which place? how uncertain? what to do? what does the field change? Show the decision contract (tier + radius + gate + reasons).
+**Slide 3 — Reframing the task (workflow diagram goes up here).** Four operator questions: which place? how uncertain? what to do? what does the field change? Show the decision contract (tier + radius + gate + reasons).
 
-**Slide 4 — System diagram.** The three lanes (production / evidence / offline) — point out the offline lane *cannot touch* production by construction.
+**Slide 4 — System diagram (architecture diagram goes up here).** The lanes (production / evidence / offline) — point out the offline lane *cannot touch* production by construction.
 
 **Slide 5 — Candidates first, ranking second.** Oracle ladder 71→88%; retrieval-v2 raises the ceiling **and the ranked top-1 doesn't move — we report both**. "Candidate availability and candidate selection are different problems."
 

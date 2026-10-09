@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 712" font-family="DejaVu Sans, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#60584B"/>
+    </marker>
+    <marker id="arro" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C4501B"/>
+    </marker>
+    <marker id="arrg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3B7449"/>
+    </marker>
+    <marker id="arrp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6D4F6E"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="712" fill="#FBF9F2"/>
+  <text x="28" y="40" font-size="24" font-weight="bold" fill="#211D14" font-family="DejaVu Serif, serif">SUTRA workflow — the life of one address</text>
+  <text x="28" y="64" font-size="13" fill="#60584B">request path · decision · action · evidence loop — orange = production · green = evidence · plum = memory · red = guardrails</text>
+
+  <!-- ── lane A: production request path ─────────────────────────────────── -->
+  <rect x="24" y="82" width="1152" height="200" fill="#F5E0CF" opacity="0.35" stroke="#C4501B" stroke-width="1.4"/>
+  <text x="40" y="108" font-size="13" fill="#A63E12" font-weight="bold" font-family="DejaVu Sans Mono, monospace">PRODUCTION REQUEST PATH · deterministic · reason-coded · p95 38.9 ms</text>
+
+  <g font-size="14" fill="#211D14">
+    <rect x="40" y="120" width="170" height="72" rx="7" fill="#FCFAF3" stroke="#C4501B" stroke-width="1.6"/>
+    <text x="52" y="150">raw address</text><text x="52" y="172" fill="#60584B" font-size="12">+ request purpose</text>
+    <rect x="233" y="120" width="170" height="72" rx="7" fill="#FCFAF3" stroke="#C4501B" stroke-width="1.6"/>
+    <text x="245" y="150">normalise / parse</text><text x="245" y="172" fill="#60584B" font-size="12">NFKC · abbrev · spans</text>
+    <rect x="426" y="120" width="170" height="72" rx="7" fill="#FCFAF3" stroke="#C4501B" stroke-width="1.6"/>
+    <text x="438" y="150">entity resolution</text><text x="438" y="172" fill="#60584B" font-size="12">town · locality (v2)</text>
+    <rect x="619" y="120" width="170" height="72" rx="7" fill="#FCFAF3" stroke="#C4501B" stroke-width="1.6"/>
+    <text x="631" y="150">candidate generation</text><text x="631" y="172" fill="#60584B" font-size="12">5 static + evidence arms</text>
+    <rect x="812" y="120" width="170" height="72" rx="7" fill="#FCFAF3" stroke="#C4501B" stroke-width="1.6"/>
+    <text x="824" y="150">RULE ranker</text><text x="824" y="172" fill="#60584B" font-size="12">reason-coded · frozen</text>
+    <rect x="1005" y="120" width="170" height="72" rx="7" fill="#C4501B" stroke="#A63E12" stroke-width="1.6"/>
+    <text x="1017" y="150" fill="#FCFAF3">gate v2</text><text x="1017" y="172" fill="#F5E0CF" font-size="12">SERVE · VERIFY · REFUSE</text>
+
+    <line x1="210" y1="156" x2="229" y2="156" stroke="#C4501B" stroke-width="1.8" marker-end="url(#arro)"/>
+    <line x1="403" y1="156" x2="422" y2="156" stroke="#C4501B" stroke-width="1.8" marker-end="url(#arro)"/>
+    <line x1="596" y1="156" x2="615" y2="156" stroke="#C4501B" stroke-width="1.8" marker-end="url(#arro)"/>
+    <line x1="789" y1="156" x2="808" y2="156" stroke="#C4501B" stroke-width="1.8" marker-end="url(#arro)"/>
+    <line x1="982" y1="156" x2="1001" y2="156" stroke="#C4501B" stroke-width="1.8" marker-end="url(#arro)"/>
+
+    <rect x="860" y="214" width="300" height="52" rx="7" fill="#FCFAF3" stroke="#C4501B" stroke-width="1.6"/>
+    <text x="872" y="235" font-size="12.5">decision ticket: coordinate + granularity,</text>
+    <text x="872" y="253" font-size="12.5">radius · n · coverage · typed reasons</text>
+    <line x1="1090" y1="192" x2="1090" y2="210" stroke="#C4501B" stroke-width="1.8" marker-end="url(#arro)"/>
+  </g>
+
+  <!-- ── lane B: outcomes ─────────────────────────────────────────────────── -->
+  <rect x="24" y="312" width="1152" height="110" fill="#F4F0E4" opacity="0.8" stroke="#C9C0A6" stroke-width="1.4"/>
+  <text x="40" y="338" font-size="13" fill="#60584B" font-weight="bold" font-family="DejaVu Sans Mono, monospace">OUTCOMES</text>
+
+  <g font-size="14" fill="#211D14">
+    <rect x="40" y="350" width="340" height="60" rx="7" fill="#FCFAF3" stroke="#3B7449" stroke-width="1.6"/>
+    <text x="54" y="374" fill="#3B7449" font-weight="bold">SERVE — navigate</text><text x="54" y="396" fill="#60584B" font-size="12">coordinate + radius + n + coverage</text>
+    <rect x="420" y="350" width="340" height="60" rx="7" fill="#FCFAF3" stroke="#8D6117" stroke-width="1.6"/>
+    <text x="434" y="374" fill="#8D6117" font-weight="bold">VERIFY FIRST — courier confirms</text><text x="434" y="396" fill="#60584B" font-size="12">coordinate + confirm flag + reasons</text>
+    <rect x="820" y="350" width="340" height="60" rx="7" fill="#FCFAF3" stroke="#B23A2B" stroke-width="1.6"/>
+    <text x="834" y="374" fill="#B23A2B" font-weight="bold">REFUSE — no coordinate</text><text x="834" y="396" fill="#60584B" font-size="12">escalate · join verify queue</text>
+  </g>
+
+  <!-- fan from ticket to the three outcomes -->
+  <line x1="1010" y1="266" x2="1010" y2="298" stroke="#60584B" stroke-width="1.6"/>
+  <line x1="210" y1="298" x2="1010" y2="298" stroke="#60584B" stroke-width="1.6"/>
+  <line x1="210" y1="298" x2="210" y2="346" stroke="#60584B" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="590" y1="298" x2="590" y2="346" stroke="#60584B" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="990" y1="298" x2="990" y2="346" stroke="#60584B" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- ── lane C: field evidence loop ─────────────────────────────────────── -->
+  <rect x="24" y="452" width="1152" height="170" fill="#E3EBDA" opacity="0.4" stroke="#3B7449" stroke-width="1.4"/>
+  <text x="1030" y="478" font-size="13" fill="#3B7449" font-weight="bold" font-family="DejaVu Sans Mono, monospace" text-anchor="end">FIELD EVIDENCE LOOP · append-only · idempotent · as-of</text>
+
+  <g font-size="14" fill="#211D14">
+    <rect x="40" y="490" width="210" height="72" rx="7" fill="#FCFAF3" stroke="#3B7449" stroke-width="1.6"/>
+    <text x="52" y="520">field outcome logged</text><text x="52" y="542" fill="#60584B" font-size="12">delivered · attempt · trace</text>
+    <rect x="267" y="490" width="210" height="72" rx="7" fill="#FCFAF3" stroke="#3B7449" stroke-width="1.6"/>
+    <text x="279" y="520">tail-3 estimate</text><text x="279" y="542" fill="#60584B" font-size="12">median of last 3 fixes · 7.6 m</text>
+    <rect x="494" y="490" width="210" height="72" rx="7" fill="#FCFAF3" stroke="#3B7449" stroke-width="1.6"/>
+    <text x="506" y="520">integrity weighting</text><text x="506" y="542" fill="#60584B" font-size="12">media · trail · dwell · agent</text>
+    <rect x="721" y="490" width="210" height="72" rx="7" fill="#FCFAF3" stroke="#3B7449" stroke-width="1.6"/>
+    <text x="733" y="520">belief update</text><text x="733" y="542" fill="#60584B" font-size="12">≤ 1 tier step · 2 to promote</text>
+    <rect x="948" y="490" width="210" height="72" rx="7" fill="#ECE0EA" stroke="#6D4F6E" stroke-width="1.6"/>
+    <text x="960" y="520" fill="#4a354b">place memory</text><text x="960" y="542" fill="#6D4F6E" font-size="12">sealed ledger · priors only</text>
+
+    <line x1="250" y1="526" x2="263" y2="526" stroke="#3B7449" stroke-width="1.8" marker-end="url(#arrg)"/>
+    <line x1="477" y1="526" x2="490" y2="526" stroke="#3B7449" stroke-width="1.8" marker-end="url(#arrg)"/>
+    <line x1="704" y1="526" x2="717" y2="526" stroke="#3B7449" stroke-width="1.8" marker-end="url(#arrg)"/>
+    <line x1="931" y1="526" x2="944" y2="526" stroke="#3B7449" stroke-width="1.8" marker-end="url(#arrg)"/>
+  </g>
+
+  <!-- served deliveries feed the evidence loop -->
+  <line x1="210" y1="410" x2="210" y2="438" stroke="#3B7449" stroke-width="1.6"/>
+  <line x1="210" y1="438" x2="145" y2="438" stroke="#3B7449" stroke-width="1.6"/>
+  <line x1="145" y1="438" x2="145" y2="486" stroke="#3B7449" stroke-width="1.6" marker-end="url(#arrg)"/>
+
+  <!-- memory feeds production candidates (the one closed loop) -->
+  <line x1="1053" y1="490" x2="1053" y2="438" stroke="#6D4F6E" stroke-width="1.8"/>
+  <line x1="1053" y1="438" x2="790" y2="438" stroke="#6D4F6E" stroke-width="1.8"/>
+  <line x1="790" y1="438" x2="790" y2="246" stroke="#6D4F6E" stroke-width="1.8"/>
+  <line x1="790" y1="246" x2="704" y2="246" stroke="#6D4F6E" stroke-width="1.8"/>
+  <line x1="704" y1="246" x2="704" y2="196" stroke="#6D4F6E" stroke-width="1.8" marker-end="url(#arrp)"/>
+  <text x="815" y="432" font-size="12" fill="#6D4F6E">eligible memory re-enters the candidate set (as-of)</text>
+
+  <!-- guardrails -->
+  <text x="28" y="652" font-size="13" fill="#B23A2B" font-weight="bold">Guardrail: failed visits move the attempt count and the uncertainty — never the coordinate.</text>
+  <text x="28" y="676" font-size="13" fill="#60584B">Only SERVE is fully automatic; VERIFY FIRST routes a courier check; REFUSE emits no coordinate and opens a verify case.</text>
+  <text x="28" y="696" font-size="13" fill="#60584B">Only one arrow crosses lane borders (memory → candidates); every other flow stays inside its lane, and each request is replayable as-of.</text>
+</svg>
