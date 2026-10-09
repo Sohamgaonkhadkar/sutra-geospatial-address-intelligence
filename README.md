@@ -1,8 +1,8 @@
-# SUTRA — Address Geocoder That Learns from Field Visits
+# SUTRA - Address Geocoder That Learns from Field Visits
 
 SUTRA (**Semantic Utility for Traceable Resolution of Addresses**) treats address geocoding as an evidence-driven decision problem rather than a one-shot coordinate prediction. It resolves written addresses using a restricted official candidate family, returns a coordinate accompanied by spatial granularity and calibrated uncertainty, and utilizes trusted field evidence to continuously correct place beliefs over time.
 
-👉 **[Open the SUTRA Web Application](https://sutra-geospatial-address-intelligence.vercel.app/)**
+ **[Open the SUTRA Web Application](https://sutra-geospatial-address-intelligence.vercel.app/)**
 
 ## B. Website Screenshots and Product Walkthrough
 
