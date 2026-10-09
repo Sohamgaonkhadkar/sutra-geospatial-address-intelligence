@@ -1,8 +1,8 @@
-# SUTRA - Address Geocoder That Learns from Field Visits
+# SUTRA — Address Geocoder That Learns from Field Visits
 
 SUTRA (**Semantic Utility for Traceable Resolution of Addresses**) treats address geocoding as an evidence-driven decision problem rather than a one-shot coordinate prediction. It resolves written addresses using a restricted official candidate family, returns a coordinate accompanied by spatial granularity and calibrated uncertainty, and utilizes trusted field evidence to continuously correct place beliefs over time.
 
- **[Open the SUTRA Web Application](https://sutra-geospatial-address-intelligence.vercel.app/)**
+👉 **[Open the SUTRA Web Application](https://sutra-geospatial-address-intelligence.vercel.app/)**
 
 ## B. Website Screenshots and Product Walkthrough
 
@@ -36,14 +36,14 @@ Address geocoding in this dataset poses unique challenges that invalidate simple
 - **Coarse Source Coordinates:** Existing vendor coordinates exhibit a median error of 376.4 m. Predicting an exact `(x, y)` point blindly trusts an often inaccurate baseline.
 - **Ambiguous Locality Information:** Addresses frequently contain outdated or misaligned pincodes that conflict with locality text, easily confusing raw text search.
 - **Incomplete Candidate Coverage:** Official datasets often lack rooftop-level precision for rural or unmapped addresses.
-- **Field Observation Contradictions:** Field visits routinely contradict baseline coordinates (e.g., negative outcomes recorded far from actual properties).
+- **Field Observation Contradictions:** Field visits routinely contradict baseline coordinates. A "not traceable" outcome typically occurs 1,603 m away from the true coordinate.
 - **Coordinate Availability vs. Reliability:** The presence of a GPS pin does not guarantee accuracy. A 10 m pin from a failed delivery is useless for finding a property.
 
-SUTRA ensures that every served coordinate is reliable by appending radius uncertainty and integrity reasons, explicitly separating **known truth** from **inferred guesses**.
+SUTRA replaces absolute claims of "correct" coordinates with precise declarations of uncertainty, provenance, verification status, and refusal. It explicitly separates **known truth** from **inferred guesses**.
 
 ## D. SUTRA Approach
 
-SUTRA completely abandons black-box geographic predictions. The resolution path follows:
+SUTRA abandons black-box geographic predictions. The resolution path follows:
 1. **Raw Address Text**
 2. **Normalization and Parsing:** Typing specific elements (house no, locality).
 3. **Entity Resolution:** Aligning tokens against official town and locality gazetteers.
@@ -102,11 +102,12 @@ flowchart TD
 
     classDef implemented fill:#1f77b4,color:#fff,stroke:#fff;
     classDef offline fill:#ff7f0e,color:#fff,stroke:#fff;
+    classDef unimpl fill:#555,color:#ccc,stroke:#fff,stroke-dasharray: 5 5;
     
     class A,S0,S1,S2,S3,S4,S5,S6,S7,S8,SERVE,EVIDENCE,S9,S10,S11,S12 implemented;
     class S13 offline;
 ```
-*(Blue = Implemented Production, Orange = Offline Experiment/Analysis)*
+*(Blue = Implemented Production, Orange = Offline Experiment/Analysis, Dashed = Unimplemented Capabilities)*
 
 ## F. Technical Architecture and Stack
 - **React & Vite Frontend (`battle_model/`):** An interactive UI deployed to Vercel that calls the backend. 
@@ -126,12 +127,37 @@ SUTRA relies exclusively on **Official PS3 Data** (`data/official_ps3/`).
 
 ## H. Deep EDA and Discoveries
 
-1. **Baseline Precision Labels vs. Observed Spatial Error:** A pin categorized as "precise" by a vendor does not automatically mean "accurate". Vendors commonly place pins on nearby landmarks when failing to find rooftops.
-2. **Account Identity vs. Place Identity:** Multiple accounts often physically reside in the exact same location. Treating address resolution as an account problem (1:1) causes redundancy. Place Memory clusters overlapping accounts.
-3. **Negative Outcomes Are Not Spatial Ground Truths:** Agents reporting "Address not Traceable" after spending 1.3 minutes standing 1,600m from the true coordinate means negative evidence is only useful to flag record suspicion, not to relocate coordinates.
-4. **Candidate Oracle Ceiling:** Relying entirely on existing official candidates gives a maximum possible oracle precision of ~76% within 500m. True resolution requires memory loops.
+1. **Baseline Precision vs Actual Spatial Error:** 
+   *Finding:* Vendor coordinates labeled "precise" can be drastically inaccurate. 
+   *Evidence:* The vendor baseline has a median error of 376.4 m. Furthermore, failed agent check-ins ("not traceable") have a dwell time of 1.3 minutes but are located a median 1,603 m away from surveyed truth.
+   *Consequence:* Relying blindly on vendor points without uncertainty radii leads to catastrophic failure.
 
-## I. Add beautiful EDA plots to the README
+2. **Retrieval-v2 and Candidate Generation vs Ranking:** 
+   *Finding:* Improving the candidate pool does not automatically mean the ranker will select the right one.
+   *Evidence:* The `retrieval-v2` update improved the candidate oracle ceiling from 88.01% to 91.44% (within 500 m) and reduced the oracle median error from 214.1 m to 196.1 m. However, the top-1 ranked answer remained virtually unchanged (83.9%). 
+   *Consequence:* Candidate generation and ranking are separate, orthogonal problems.
+
+3. **Account Identity vs Physical-Place Identity & Co-location:** 
+   *Finding:* Multiple accounts often reside at the exact same physical location. 
+   *Evidence:* 191 addresses fell into 81 co-location clusters across entirely different accounts (127 pairs). Conversely, addresses belonging to the *same* account were a median 3,011.6 m apart. 
+   *Consequence:* SUTRA's memory must be keyed by place evidence (co-location ≤ 30 m), never by account identity.
+
+4. **Pin-Derived Memory Failure:** 
+   *Finding:* Using a vendor pin as "memory" is actively harmful. 
+   *Evidence:* Materializing a memory candidate from a mere vendor pin dropped temporal accuracy (< 100 m) from 0.8903 down to 0.6498. 
+   *Consequence:* The final evidence-backed memory policy (P1b) strictly withholds pin-derived answers, safely narrowing the S-EVAL warm lane to 31 verified field-evidence cases rather than incorrectly emitting 45.
+
+5. **GPS Quality & Repeated-Visit Estimation:** 
+   *Finding:* Valid repeated visits correlate strongly. 
+   *Evidence:* Repeat visits agree spatially (77.7 m for same-agent, 75.8 m for different-agent). 
+   *Consequence:* SUTRA confidently promotes coordinates backed by independent confirmations.
+
+6. **Landmark Limitations and Negative Findings:** 
+   *Finding:* Broadening candidate arms via generic landmarks creates excessive noise. 
+   *Evidence:* An address-book near-duplicate generator (coverage 42.8%, median 247 m) rescued 1 location but ruined 66. A pincode-consistent locality generator (coverage 85%, median 321.9 m) rescued 0 locations and ruined 144.
+   *Consequence:* These generators were formally rejected. SUTRA restricts itself to high-quality arms.
+
+## I. EDA Plots
 
 ### Baseline Spatial Error
 ![Baseline Error ECDF](docs/assets/eda/baseline-error-ecdf.png)
@@ -151,8 +177,8 @@ Visualizing the dramatic shift in spatial error once field evidence is folded in
 
 ## J. Model Training and Evaluation
 The `notebooks/SUTRA_Model_Training_FINAL.ipynb` file encapsulates the final offline evaluation and training workflow. 
-We evaluated logistic regression, Pairwise ranking (LambdaMART-style), and a deterministic **RULE baseline**.
-**Outcome:** The deterministic production RULE remains the production configuration. In S-VAL offline evaluation, the advanced learned challengers failed to clear the strict predefined promotion gate required to supersede the honest, interpretable RULE configuration.
+
+**Model Selection:** The production system utilizes a deterministic **RULE-based ranker**. While advanced learned challengers (Logistic Regression, LambdaMART, and Pairwise ranking) were evaluated strictly offline on the S-VAL split, they failed to clear the predefined promotion gate required to supersede the honest, interpretable RULE configuration. Therefore, the challengers remain offline experiments.
 
 ## K. Final Measured Results
 All figures derived explicitly from the final authoritative S-EVAL artifacts:
@@ -161,19 +187,20 @@ All figures derived explicitly from the final authoritative S-EVAL artifacts:
   - 71% within 500 m
   - Median error: 375.8 m
 - **Independent S-EVAL product lane (n=100):**
-  - <100m: 33%
-  - <250m: 55%
-  - <500m: 76%
+  - < 100 m: 33%
+  - < 250 m: 55%
+  - < 500 m: 76%
   - Median error: 202.2 m
 - **Warm/Evidence Evaluation (n=31 answered cases):**
   - 96.77% within 500 m
   - Median error: 12.4 m
-
-*(Note: These distinct regimes are explicit and should not be conflated into a single monolithic "model accuracy" metric.)*
+- **Documented S-EVAL Candidate Oracle Ceiling (n=100):**
+  - ~88.01% within 500 m
+  - *(Note: The oracle ceiling represents candidate availability, not SUTRA's ranked performance, which is 76%).*
 
 ## L. Leakage Prevention and Evaluation Integrity
 - **Surveyed-Truth Firewall:** `surveyed_addresses.csv` is explicitly denied access from the `sutra/` module.
-- **S-TRAIN / S-VAL / S-EVAL Separation:** Offline folds strictly prevent target leakage.
+- **Place-block Folds:** Random splits allow severe spatial leakage (test addresses with a met visit have a train met visit within 30 m in 36% of cases). The offline evaluation employs a place-block firewall (3007 blocks, 81 multi-address) to ensure out-of-fold generalization.
 - **As-of Temporal Filtering:** Features derived from field visits respect `as_of` constraints to ensure future visits never bleed into past resolutions.
 
 ## M. Field Evidence, Integrity and Memory
@@ -183,9 +210,9 @@ Field visits are integrated as evidence, not automatic overwrites. SUTRA uses:
 - **Negative Evidence:** A failed visit widens the radius and marks the address `MOVED_SUSPECTED`, triggering re-verification queues.
 
 ## N. Failure Modes and Limitations
-- **Ambiguous Address Text:** Deeply ambiguous text (e.g., generic street names shared across multiple towns) restricts resolution to coarse locality fallback tiers.
-- **Official Candidate Limitations:** In cold-start scenarios, if the baseline vendor point is poor and no official locality polygon covers the area, the system cannot invent a closer point and must refuse service or serve a wide town centroid.
-- **Warm/Evidence Coverage Gap:** The 12.4 m median error is achieved *only* on the subset of records with reliable prior field evidence, not globally.
+- **Ambiguous Address Text:** Deeply ambiguous text restricts resolution to coarse locality fallback tiers.
+- **Official Candidate Limitations:** In cold-start scenarios, if the baseline vendor point is poor and no official locality polygon covers the area, the system must refuse service or serve a wide town centroid. It cannot magically invent a closer point.
+- **Warm/Evidence Coverage Gap:** The 12.4 m median error is achieved *only* on the verified 31/100 cases with reliable prior field evidence, not globally across the entire database.
 
 ## O. Repository Structure
 - `battle_model/` - The Vite + React web frontend codebase.
